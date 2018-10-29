@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Newton Scooters</title>
+  <link rel="stylesheet" type="text/css" href="styles/jquery-ui.min.css">
+  <script src="scripts/jquery-3.3.1.min.js"></script>
+  <script src="scripts/jquery-ui.min.js"></script>
+  <script src="scripts/easeljs.min.js"></script>
+  <script src="scripts/highcharts.js"></script>
+  <script src="scripts/highcharts-exporting.js"></script>
+  <script src="scripts/simulation.js"></script>
+  <script src="scripts/wise-api.js"></script>
+  <script src="scripts/main_p.js"></script>
+</head>
+
+<body onload="init()">
+<table>
+  <tbody><tr>
+    <td style="position:relative;vertical-align:top;background-color:#EEFFEE;padding-top:20px">
+      <table><tbody>
+      <tr><td style="color:black;font:18px Arial;padding-left:30px">inflate balloon</td></tr>
+      <tr><td style="padding:5px;padding-left:10px">
+        <div id="slider_crank" style="width:160px"></div>
+      </td></tr>
+      <tr><td><div id="uielems" style="padding:10px;background-color:#EEFFEE;"></div></td></tr>
+      <tr><td style="padding:10px;text-align:center">
+        <button type="button" id="button_run" onclick="run()">Run</button>
+      </td></tr>
+      <tr><td style="padding:10px;text-align:center">
+        <button type="button" id="button_pause" onclick="pause()">Pause</button>
+      </td></tr>
+      </tbody></table>
+    </td>
+    <td>
+      <table><tbody>
+      <tr>
+        <td><div id="plot1" style="position:relative"></div></td>
+        <td><div id="plot2" style="position:relative"></div></td>
+      </tr>
+      </tbody></table>
+      <table><tbody>
+      <tr>
+        <td>
+          <div style="position:relative; top:0px; left:0px">
+            <canvas id="canvas" width=760 height=200 style="position:relative; background-color:#eeeeef"></canvas>
+            <h2 id="score" style="position:absolute; left:40px; top:20px"></h2>
+          </div>
+        </td>
+      </tr>
+      </tbody></table>
+    </td>
+  </tr></tbody>
+</table>
+<div id="dialog" title="Instructions"></div>
+<div id="congrats" title=""></div>
+</body>
+</html>
