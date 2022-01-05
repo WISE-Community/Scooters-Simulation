@@ -134,6 +134,7 @@ var worldSpecs = {
 
 var isDragging = false;
 var inflateStep = 10;
+var isInflationOnly = false;
 var paramsMap = {
   'friction': setUiVar,
   'inflateStep': setInflationStep,
@@ -142,6 +143,7 @@ var paramsMap = {
   'version': setVersion,
   'wheel_radius': setUiVar
 };
+
 function setInflationStep(key, value) {
   inflateStep = parseInt(value);
 }
@@ -168,6 +170,9 @@ function setVars() {
       var value = urlParams.get(key);
       paramsMap[key](key, value);
     }
+  }
+  if (!worldSpecs.uivars.mass.in_ui && !worldSpecs.uivars.friction.in_ui && !worldSpecs.uivars.wheel_radius.in_ui) {
+    isInflationOnly = true;
   }
 }
 
@@ -419,7 +424,9 @@ function init(params){
     world.addChild(agent);
   }
 
+  world.crank = null;
   world.previous_score = null;
+  world.previous_crank = null;
   world.attemptNum = 1;
 
   updateInitial();
@@ -533,9 +540,13 @@ function updateInitial(){
       if (world.target != null){
         plot2.setTitle({text: "Last Trial: " + world.previous_score + " m from target"});
       } else {
-        plot2.setTitle({text: "Last Trial: " + world.previous_score + " m"});
-        $('#previousScore').text('Last Trial: ' + world.previous_score + ' meters')
-				plot1.setTitle ({text: 'Current Trial'});
+        var title = "Last Trial: " + world.previous_score + " m";
+        if (isInflationOnly) {
+          title += " (Balloon " + world.previous_crank + "% full)";
+        }
+        plot2.setTitle({text: title});
+        $('#previousScore').text("Last Trial: " + world.previous_score + " meters")
+				plot1.setTitle ({text: "Current Trial"});
       }
     }
     world.isRunning = false;
@@ -543,6 +554,7 @@ function updateInitial(){
 
   } else {
     var crankValue = $("#slider_crank").slider('value');
+    world.crank = crankValue;
     var initial_potential = 0;
     if (world.agent != null){
       var agent = world.agent;
@@ -871,8 +883,13 @@ function showScore(){
     if (previous_dist !== null) {
       $("#previousScore").text("Last Trial: " + previous_dist + " meters");
     }
-    plot1.setTitle({ text: "Current Trial: " + dist + " m" });
+    var title = "Current Trial: " + dist + " m";
+    if (isInflationOnly) {
+      title += " (Balloon " + world.crank + "% full)";
+    }
+    plot1.setTitle({ text: title });
     $("#congrats").html("Great job! You can try again with new slider values. <br/> <p style='color:red'><b>Hint: Look carefully at your graphs of energy.</p>").dialog("open");
+    world.previous_crank = world.crank;
   }
 }
 
