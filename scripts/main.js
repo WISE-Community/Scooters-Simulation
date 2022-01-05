@@ -534,6 +534,8 @@ function updateInitial(){
         plot2.setTitle({text: "Last Trial: " + world.previous_score + " m from target"});
       } else {
         plot2.setTitle({text: "Last Trial: " + world.previous_score + " m"});
+        $('#previousScore').text('Last Trial: ' + world.previous_score + ' meters')
+				plot1.setTitle ({text: 'Current Trial'});
       }
     }
     world.isRunning = false;
@@ -846,6 +848,7 @@ function showScore(){
   var h = {"fun": "Score", "val":dist, timestamp:Date.parse(new Date())};
   addToWISELog(h, null);
   //$("#slider_crank").slider('value', 100);
+  var previous_dist = world.previous_score;
   world.previous_score = dist;
   if (world.target != null){
     $("#score").text("Distance from target: " + world.previous_score + " meters");
@@ -865,6 +868,10 @@ function showScore(){
     }
   } else {
     $("#score").text("Final Distance: " + dist + " meters");
+    if (previous_dist !== null) {
+      $("#previousScore").text("Last Trial: " + previous_dist + " meters");
+    }
+    plot1.setTitle({ text: "Current Trial: " + dist + " m" });
     $("#congrats").html("Great job! You can try again with new slider values. <br/> <p style='color:red'><b>Hint: Look carefully at your graphs of energy.</p>").dialog("open");
   }
 }
