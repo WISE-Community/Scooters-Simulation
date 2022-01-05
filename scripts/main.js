@@ -133,10 +133,29 @@ var worldSpecs = {
 }
 
 var isDragging = false;
+var inflateStep = 10;
+
+function setParams(params) {
+  var queryString = window.location.search;
+  var urlParams = new URLSearchParams(queryString);
+  var version = urlParams.has('version') ? urlParams.get('version') : null;
+  worldSpecs.version = version ? version : params.version;
+  if (urlParams.has('inflateStep')) {
+    inflateStep = parseInt(urlParams.get('inflateStep'));
+  }
+  if (urlParams.has('hideControls')) {
+    var hiddenControls = urlParams.get('hideControls').split(',');
+    for (var control of hiddenControls) {
+      if (worldSpecs.uivars[control]) {
+        worldSpecs.uivars[control].in_ui = false;
+      }
+    }
+  }
+}
 
 function init(params){
+  setParams(params);
   var alreadyVisited = false;
-  worldSpecs.version = params.version;
   //if (stage != null) alreadyVisited = true;
   if (worldSpecs.version === "p") {
     worldSpecs.plot1.series.splice(1,2);
@@ -176,7 +195,7 @@ function init(params){
     min: 0,
     max: 100,
     value: 0,
-    step: 10,
+    step: inflateStep,
     slide: function(event, ui){
       var key = event.target.id.replace("slider_","");
       updateInitial();
@@ -239,7 +258,7 @@ function init(params){
   for (var uikey in worldSpecs.uivars){
     uivar = worldSpecs.uivars[uikey];
     // are we displaying this in the ui area?
-    if ((typeof uivar.in_ui !== "undefined" && uivar.in_ui) || (typeof uivar.type !== "undefined" && uivar.type.length > 0)){
+    if ((typeof uivar.in_ui !== "undefined") || (typeof uivar.type !== "undefined" && uivar.type.length > 0)){
       // what type of element is it, can be set explicitly or inferred
       uivar.type = typeof uivar.type !== "undefined" ? uivar.type : (typeof uivar.max !== "undefined" ? "slider" : "button");
       var position = typeof uivar.position !== "undefined" ? uivar.position : null;
@@ -255,14 +274,15 @@ function init(params){
           var name = typeof uivar.name !== "undefined"? uivar.name : uikey;
           // label
           html = '<div id="slabel_' + uikey + '" style="font:18px Arial;text-align:center;padding-bottom:5px;color:#444444;width:' + lw + 'px;">'+ name + ': <span id="svalue_' + uikey + '" style="color:#FF0000;">'+uivar.value+'</span></div>';
-          $("#uielems").append(html);
           // slider
-          html = '<div id="' + uivar.type + '_' + uikey + '" name="'+name+'" style="width:' + w + 'px; margin-left:' + (lw-w)/2 + 'px;"></div>';
-          $("#uielems").append(html);
+          html += '<div id="' + uivar.type + '_' + uikey + '" name="'+name+'" style="width:' + w + 'px; margin-left:' + (lw-w)/2 + 'px;"></div>';
           // min, cur, text
-          html = '<table style="padding-bottom:10px;width:' + w + 'px; margin-left:' + (lw-w)/2 + 'px;"><tbody><tr><td>'+uivar.min+'</td><td style="text-align:right">'+uivar.max+'</td></tr></tbody></table';
-          $("#uielems").append(html);
-
+          html += '<table style="padding-bottom:10px;width:' + w + 'px; margin-left:' + (lw-w)/2 + 'px;"><tbody><tr><td>'+uivar.min+'</td><td style="text-align:right">'+uivar.max+'</td></tr></tbody></table';
+          $html = $(html);
+          if (!uivar.in_ui) {
+            $html.css('display', 'none')
+          }
+          $("#uielems").append($html);
         } else if (uivar.type == "button"){
           html = '<input type="submit" id="' + uivar.type + '_' + uikey + '" value="' + uivar.value + '"/>';
           $("#uielems").append(html);
@@ -477,9 +497,6 @@ function updateInitial(){
         data1.push({x:plot1.series[1].data[i].x, y:plot1.series[1].data[i].y});
         data2.push({x:plot1.series[2].data[i].x, y:plot1.series[2].data[i].y});
       }
-      //data0.push({x:plot1.series[0].data[i].x, y:plot1.series[0].data[i].y});
-      //data1.push({x:plot1.series[1].data[i].x, y:plot1.series[1].data[i].y});
-      //data2.push({x:plot1.series[2].data[i].x, y:plot1.series[2].data[i].y});
     }
     if (worldSpecs.version === "p") {
       plot2.series[0].setData(data0, true);
@@ -491,10 +508,6 @@ function updateInitial(){
       plot2.series[1].setData(data1, false);
       plot2.series[2].setData(data2, true);
     }
-
-    //plot2.series[0].setData(data0, true);
-    //plot2.series[1].setData(data1, false);
-    //plot2.series[2].setData(data2, true);
     if ($("#score").text() == ""){
       plot2.setTitle({text: "Last Trial: INCOMPLETE"})
     } else {
