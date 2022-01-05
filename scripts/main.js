@@ -135,24 +135,29 @@ var worldSpecs = {
 var isDragging = false;
 var inflateStep = 10;
 var paramsMap = {
-  'inflateStep': setInflationStep,
-  'version': setVersion,
-  'mass': setUiVar,
   'friction': setUiVar,
+  'inflateStep': setInflationStep,
+  'mass': setUiVar,
+  'maxTime': setMaxTime,
+  'version': setVersion,
   'wheel_radius': setUiVar
 };
-
 function setInflationStep(key, value) {
   inflateStep = parseInt(value);
 }
 
-function setVersion(key, value) {
-  worldSpecs.version = value;
+function setMaxTime(key, value) {
+  worldSpecs.plot1.xAxis.max = parseInt(value);
+  worldSpecs.plot2.xAxis.max = parseInt(value);
 }
 
 function setUiVar(key, value) {
   var newVars = JSON.parse(value);
   Object.assign(worldSpecs.uivars[key], newVars);
+}
+
+function setVersion(key, value) {
+  worldSpecs.version = value;
 }
 
 function setVars() {
