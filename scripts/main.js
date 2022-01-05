@@ -12,9 +12,9 @@ var worldSpecs = {
     //,target:{pos: 8}
   },
   uivars:{
-    mass:{value:10, in_ui:true, in_table:true, name:"mass", min:1, max:20, step:0.1},
-    friction:{value:0.25, in_ui:true, in_table:true, name:"friction", min:0, max:0.5, step:0.01},
-    wheel_radius:{value:1, in_ui:true, in_table:true, name:"wheel radius", min:1, max:2, step:1}
+    mass:{value:10, in_ui:true, in_table:true, name:"Mass", min:1, max:20, step:0.1},
+    friction:{value:0.25, in_ui:true, in_table:true, name:"Friction", min:0, max:0.5, step:0.01},
+    wheel_radius:{value:1, in_ui:true, in_table:true, name:"Wheel Radius", min:1, max:2, step:1}
   },
   plot1:{
     chart:{
@@ -529,18 +529,15 @@ function updateInitial(){
       agent.initial_potential = initial_potential;
       var data = calculateData();
       if (worldSpecs.version === "p") {
-        plot1.series[0].setData(data.potential, true);
+        plot1.series[0].setData([], false);
       } else if (worldSpecs.version === "pk") {
-        plot1.series[0].setData(data.potential, false);
-        plot1.series[1].setData(data.kinetic, true);
+        plot1.series[0].setData([], false);
+        plot1.series[1].setData([], true);
       } else if (worldSpecs.version === "pkt") {
-        plot1.series[0].setData(data.potential, false);
-        plot1.series[1].setData(data.kinetic, false);
-        plot1.series[2].setData(data.thermal, true);
+        plot1.series[0].setData([], false);
+        plot1.series[1].setData([], false);
+        plot1.series[2].setData([], true);
       }
-      //plot1.series[0].setData(data.potential, true);
-      //plot1.series[1].setData(data.kinetic, false);
-      //plot1.series[2].setData(data.thermal, true);
 
     }
     world.isPaused = false;
@@ -774,13 +771,15 @@ function pause(){
 function tick() {
   if (world != null && world.isRunning && !world.isPaused && !world.trialCompleted){
     if (world.ticks < world.agent.data.length){
-      var drawGraphs = world.ticks % 5 == 0;
+      // var drawGraphs = world.ticks % 5 == 0;
+      var drawGraphs = true;
       var point = world.agent.data[world.ticks];
-
       drawWorldAtTick(world.ticks, drawGraphs);
       // if we are done moving show final distance
       if ($("#score").text() == "" && world.ticks > 0 && point.pos == world.agent.data[world.ticks-1].pos){
         showScore();
+        world.trialCompleted = true;
+        stage.needs_to_update = true;
       }
 
       world.ticks++;
@@ -841,7 +840,6 @@ function showScore(){
 function drawWorldAtTick(tick, drawGraphs){
   if (tick < world.agent.data.length && world.isRunning){
     var agent = world.agent;
-    // don't plot on every tick or else it will be too slow
     var point = agent.data[tick];
     agent.x = point.pos * world.SCALE;
     var distance = 0;
@@ -857,6 +855,18 @@ function drawWorldAtTick(tick, drawGraphs){
       var spring = world.spring;
       if (spring.data[tick].displacement > 0){
         drawSpring(spring, spring.max_width_px - world.SCALE * spring.data[tick].displacement, spring.max_height_px);
+      }
+    }
+    if (drawGraphs) {
+      if (worldSpecs.version === "p") {
+        plot1.series[0].addPoint({ x: point.t, y: point.potential }, true);
+      } else if (worldSpecs.version === "pk") {
+        plot1.series[0].addPoint({ x: point.t, y: point.potential }, false);
+        plot1.series[1].addPoint({ x: point.t, y: point.kinetic }, true);
+      } else if (worldSpecs.version === "pkt") {
+        plot1.series[0].addPoint({ x: point.t, y: point.potential }, false);
+        plot1.series[1].addPoint({ x: point.t, y: point.kinetic }, false);
+        plot1.series[2].addPoint({ x: point.t, y: point.thermal }, true);
       }
     }
     stage.needs_to_update = true;
