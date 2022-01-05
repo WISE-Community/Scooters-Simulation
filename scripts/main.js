@@ -134,27 +134,41 @@ var worldSpecs = {
 
 var isDragging = false;
 var inflateStep = 10;
+var paramsMap = {
+  'inflateStep': setInflationStep,
+  'version': setVersion,
+  'mass': setUiVar,
+  'friction': setUiVar,
+  'wheel_radius': setUiVar
+};
 
-function setParams(params) {
+function setInflationStep(key, value) {
+  inflateStep = parseInt(value);
+}
+
+function setVersion(key, value) {
+  worldSpecs.version = value;
+}
+
+function setUiVar(key, value) {
+  var newVars = JSON.parse(value);
+  Object.assign(worldSpecs.uivars[key], newVars);
+}
+
+function setVars() {
   var queryString = window.location.search;
   var urlParams = new URLSearchParams(queryString);
-  var version = urlParams.has('version') ? urlParams.get('version') : null;
-  worldSpecs.version = version ? version : params.version;
-  if (urlParams.has('inflateStep')) {
-    inflateStep = parseInt(urlParams.get('inflateStep'));
-  }
-  if (urlParams.has('hideControls')) {
-    var hiddenControls = urlParams.get('hideControls').split(',');
-    for (var control of hiddenControls) {
-      if (worldSpecs.uivars[control]) {
-        worldSpecs.uivars[control].in_ui = false;
-      }
+  for (var key of urlParams.keys()) {
+    if (paramsMap[key]) {
+      var value = urlParams.get(key);
+      paramsMap[key](key, value);
     }
   }
 }
 
 function init(params){
-  setParams(params);
+  worldSpecs.version = params.version;
+  setVars();
   var alreadyVisited = false;
   //if (stage != null) alreadyVisited = true;
   if (worldSpecs.version === "p") {
