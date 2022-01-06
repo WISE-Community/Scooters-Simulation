@@ -137,12 +137,19 @@ var inflateStep = 10;
 var isInflationOnly = false;
 var paramsMap = {
   'friction': setUiVar,
+  'graphs': hideGraphs,
   'inflateStep': setInflationStep,
   'mass': setUiVar,
   'maxTime': setMaxTime,
   'version': setVersion,
   'wheel_radius': setUiVar
 };
+
+function hideGraphs(key, value) {
+  if (value) {
+    $('#graphs').hide();
+  }
+}
 
 function setInflationStep(key, value) {
   inflateStep = parseInt(value);
