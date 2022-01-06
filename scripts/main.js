@@ -132,6 +132,7 @@ var worldSpecs = {
   }
 }
 
+var showGraphs = true;
 var isDragging = false;
 var inflateStep = 10;
 var isInflationOnly = false;
@@ -147,6 +148,7 @@ var paramsMap = {
 
 function hideGraphs(key, value) {
   if (value) {
+    showGraphs = false;
     $('#graphs').hide();
   }
 }
@@ -545,13 +547,9 @@ function updateInitial(){
       plot2.setTitle({text: "Last Trial: INCOMPLETE"})
     } else {
       if (world.target != null){
-        plot2.setTitle({text: "Last Trial: " + world.previous_score + " m from target"});
+        plot2.setTitle({text: "Last Trial: " + world.previous_score + " m from target (Balloon " + world.previous_crank + "% full)"});
       } else {
-        var title = "Last Trial: " + world.previous_score + " m";
-        if (isInflationOnly) {
-          title += " (Balloon " + world.previous_crank + "% full)";
-        }
-        plot2.setTitle({text: title});
+        plot2.setTitle({ text: "Last Trial: " + world.previous_score + " (Balloon " + world.previous_crank + "% full)"});
         $('#previousScore').text("Last Trial: " + world.previous_score + " meters")
 				plot1.setTitle ({text: "Current Trial"});
       }
@@ -879,7 +877,11 @@ function showScore(){
         var chances = worldSpecs.settings.numAttemptsPerTarget - world.attemptNum;
         var chanceText = chances > 1 ? " more chances" : " more chance";
         world.attemptNum++;
-        $("#congrats").html("Keep trying! You have " + chances + chanceText + " to hit the target.  <br/> <p style='color:red'><b>Hint: Look carefully at your graphs of energy.</b></p>").dialog("open");
+        var msg = "Keep trying! You have " + chances + chanceText + " to hit the target.";
+        if (showGraphs) {
+          msg += "<br/> <p style='color:red'><b>Hint: Look carefully at your graphs of energy.</b></p>";
+        }
+        $("#congrats").html(msg).dialog("open");
       } else {
         world.attemptNum = 1;
         $("#congrats").text("Sorry. Try again with a new target.").dialog("open");
@@ -890,12 +892,10 @@ function showScore(){
     if (previous_dist !== null) {
       $("#previousScore").text("Last Trial: " + previous_dist + " meters");
     }
-    var title = "Current Trial: " + dist + " m";
-    if (isInflationOnly) {
-      title += " (Balloon " + world.crank + "% full)";
+    plot1.setTitle({ text: "Current Trial: " + dist + " m (Balloon " + world.crank + "% full)" });
+    if (showGraphs) {
+      $("#congrats").html("Great job! You can try again with new slider values. <br/> <p style='color:red'><b>Hint: Look carefully at your graphs of energy.</p>").dialog("open");
     }
-    plot1.setTitle({ text: title });
-    $("#congrats").html("Great job! You can try again with new slider values. <br/> <p style='color:red'><b>Hint: Look carefully at your graphs of energy.</p>").dialog("open");
     world.previous_crank = world.crank;
   }
 }
