@@ -549,7 +549,7 @@ function updateInitial(){
       if (world.target != null){
         plot2.setTitle({text: "Last Trial: " + world.previous_score + " m from target (Balloon " + world.previous_crank + "% full)"});
       } else {
-        plot2.setTitle({ text: "Last Trial: " + world.previous_score + " (Balloon " + world.previous_crank + "% full)"});
+        plot2.setTitle({ text: "Last Trial: " + world.previous_score + " m (Balloon " + world.previous_crank + "% full)"});
         $('#previousScore').text("Last Trial: " + world.previous_score + " meters")
 				plot1.setTitle ({text: "Current Trial"});
       }
@@ -823,14 +823,12 @@ function tick() {
   if (world != null && world.isRunning && !world.isPaused && !world.trialCompleted){
     if (world.ticks < world.agent.data.length){
       // var drawGraphs = world.ticks % 5 == 0;
-      var drawGraphs = true;
       var point = world.agent.data[world.ticks];
-      drawWorldAtTick(world.ticks, drawGraphs);
+      drawWorldAtTick(world.ticks, true);
       // if we are done moving show final distance
       if ($("#score").text() == "" && world.ticks > 0 && point.pos == world.agent.data[world.ticks-1].pos){
         showScore();
         world.trialCompleted = true;
-        stage.needs_to_update = true;
       }
 
       world.ticks++;
@@ -844,8 +842,8 @@ function tick() {
         showScore();
       }
       //WISE_onclick("end-animation",{value:null});
-      stage.needs_to_update = true;
     }
+    stage.needs_to_update = true;
 
   }
 
@@ -922,14 +920,14 @@ function drawWorldAtTick(tick, drawGraphs){
     }
     if (drawGraphs) {
       if (worldSpecs.version === "p") {
-        plot1.series[0].addPoint({ x: point.t, y: point.potential }, true);
+        plot1.series[0].addPoint({ x: point.t, y: point.potential }, true, false, false);
       } else if (worldSpecs.version === "pk") {
-        plot1.series[0].addPoint({ x: point.t, y: point.potential }, false);
-        plot1.series[1].addPoint({ x: point.t, y: point.kinetic }, true);
+        plot1.series[0].addPoint({ x: point.t, y: point.potential }, true, false, false);
+        plot1.series[1].addPoint({ x: point.t, y: point.kinetic }, true, false, false);
       } else if (worldSpecs.version === "pkt") {
-        plot1.series[0].addPoint({ x: point.t, y: point.potential }, false);
-        plot1.series[1].addPoint({ x: point.t, y: point.kinetic }, false);
-        plot1.series[2].addPoint({ x: point.t, y: point.thermal }, true);
+        plot1.series[0].addPoint({ x: point.t, y: point.potential }, true, false, false);
+        plot1.series[1].addPoint({ x: point.t, y: point.kinetic }, true, false, false);
+        plot1.series[2].addPoint({ x: point.t, y: point.thermal }, true, false, false);
       }
     }
     stage.needs_to_update = true;
